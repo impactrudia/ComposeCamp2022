@@ -16,27 +16,17 @@
 
 package com.codelab.theming.ui.start
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.runtime.Composable
@@ -48,13 +38,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.codelab.theming.R
 import com.codelab.theming.data.Post
 import com.codelab.theming.data.PostRepo
-import java.util.Locale
+import com.codelab.theming.theme.*
+import java.util.*
 
 @Composable
 fun Home() {
@@ -108,14 +104,19 @@ fun Header(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = text,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .semantics { heading() }
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    )
+    Surface(
+        color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+        contentColor = MaterialTheme.colors.primary,
+        modifier = modifier.semantics { heading() }
+    ) {
+        Text(
+            text=text,
+            style=MaterialTheme.typography.subtitle2,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+    }
 }
 
 @Composable
@@ -204,12 +205,17 @@ fun PostItem(
     )
 }
 
-@Preview("Post Item")
+@Preview("Featued Post Dark")
 @Composable
 private fun PostItemPreview() {
     val post = remember { PostRepo.getFeaturedPost() }
-    Surface {
-        PostItem(post = post)
+    Surface(
+        color = MaterialTheme.colors.surface
+    ) {
+        Text(
+            text = "Hard coded colors don't respond to theme changed :(",
+            textColor = Color(0xffff00ff)
+        )
     }
 }
 
@@ -225,3 +231,94 @@ private fun FeaturedPostPreview() {
 private fun HomePreview() {
     Home()
 }
+
+@Composable
+fun JetnewsTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    MaterialTheme(
+        colors = if (darkTheme) DarkColors else LightColors,
+        typography = JetnewsTypography,
+        shapes = JetnewsShapes,
+        content = content
+    )
+}
+
+@Preview("Featured Post")
+@Composable
+private fun FeatuedPostPreview() {
+    val post = remember { PostRepo.getFeaturedPost() }
+    JetnewsTheme {
+        FeaturedPost(post = post)
+    }
+}
+
+private val Montserrat = FontFamily(
+    Font(R.font.montserrat_regular),
+    Font(R.font.montserrat_medium, FontWeight.W500),
+    Font(R.font.montserrat_semibold, FontWeight.W600)
+)
+
+private val Domine = FontFamily(
+    Font(R.font.domine_regular),
+    Font(R.font.domine_bold, FontWeight.Bold)
+)
+
+val JetnewsTypography = Typography(
+    h4 = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.W600,
+        fontSize = 30.sp
+    ),
+    h5 = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.W600,
+        fontSize = 24.sp
+    ),
+    h6 = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.W600,
+        fontSize = 20.sp
+    ),
+    subtitle1 = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.W600,
+        fontSize = 16.sp
+    ),
+    subtitle2 = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.W500,
+        fontSize = 14.sp
+    ),
+    body1 = TextStyle(
+        fontFamily = Domine,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    ),
+    body2 = TextStyle(
+        fontFamily = Montserrat,
+        fontSize = 14.sp
+    ),
+    button = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.W500,
+        fontSize = 14.sp
+    ),
+    caption = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    ),
+    overline = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.W500,
+        fontSize = 12.sp
+    )
+)
+
+val JetnewsShapes = Shapes(
+    small = CutCornerShape(topStart = 8.dp),
+    medium = CutCornerShape(topStart = 24.dp),
+    large = RoundedCornerShape(8.dp)
+)
